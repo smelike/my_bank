@@ -42,3 +42,22 @@ create table account_trans (
     created datetime default NOW(),
     modified datetime default NOW()
 );
+
+# 转账日志表
+create table transfer_log (
+    id bigint auto_increment primary key not null,
+    from bigint not null,
+    to bigint not null,
+    charge decimal(8, 3) default 0.000,
+    created datetime default NOW(),
+    modified datetime default NOW()
+);
+
+# 提现日志表 
+create table withdraw_log (
+    id bigint auto_increment primary key not null,
+    account_no bigint not null,
+    amount decimal(9, 2) default 0.00
+    created datetime default NOW(),
+    modified datetime default NOW()
+);
