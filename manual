@@ -1,0 +1,113 @@
+Readme
+
+结果：我写成了 web 应用，没有写成 api
+
+零、需求分析
+
+技术选型 
+
+框架：CakePHP
+ 
+开发环境：Windows 7 + WampServer 2.5 + PHP 5.5.12
+
+
+
+一、安装环境
+
+1、根据个人的操作系统，安装好 composer，设置扩展包镜像为中国镜像
+
+2、在项目目录 my_account 中，使用 composer 安装好 cakephp框架
+
+3、开启 使用 Apache 的 Web 环境，确保 Apache 开启 rewrite  模块
+
+
+4、导入 sql 脚本文件
+
+5、运行即可
+
+
+
+
+二、数据结构设计
+
+use my_account;
+
+# 用户表
+create table users (
+    id int auto_increment primary key,
+    mobile char(11) not null,
+    pwd char(32) not null,
+    created datetime default NOW(),
+    modified datetime default NOW()
+) engine = InnoDB;
+
+# 用户帐户表
+create table user_accounts (
+    id bigint auto_increment primary key,
+    u_id int not null,
+    account_no bigint unique key not null,
+    balance decimal(15, 3) default 0.000,
+    today_available decimal(15,3) default 10000.000,
+    passcode char(64) not null,
+    type tinyint default 0,
+    status tinyint  default 0,
+    created datetime default NOW(),
+    modified datetime default NOW()
+);
+
+# 账户类型表
+create table account_types (
+    type_id tinyint unique key not null,
+    type_name char(124) not null,
+    rate smallint not null default 0 commonet "divide 100"
+);
+
+# 帐户操作事务表
+create table account_trans (
+    id bigint auto_increment primary key not null,
+    trans_type tinyint default 0,
+    from bigint not null,
+    to bigint not null,
+    charge decimal(8, 3) default 0.000,
+    created datetime default NOW(),
+    modified datetime default NOW()
+);
+
+# 转账日志表
+create table transfer_log (
+    id bigint auto_increment primary key not null,
+    account_from bigint not null,
+    to_account bigint not null,
+    charge decimal(8, 3) default 0.000,
+    created datetime default NOW(),
+    modified datetime default NOW()
+);
+
+# 提现日志表 
+create table withdraw_log (
+    id bigint auto_increment primary key not null,
+    account_no bigint not null,
+    amount decimal(9, 2) default 0.00,
+    created datetime default NOW(),
+    modified datetime default NOW()
+);
+
+三、功能实现
+
+    主要的文件有 AccountController.php, AccountBehavior.php, AccountTransBehavior.php
+    
+    
+    没具体代码实现的功能：零手续费转账 与 收费转账
+    
+    伪代码思路
+    
+        AccountTransBehavior.php 封装 log 方法，操作 account_trans 表
+        
+        AccountBehavior.php 封装：当天转账剩余额度检查，额度变化操作，手续费计算
+        
+        注意要点：使用 MySQL 事务，防止出现 SQL 语句执行失败，导致数据的不一致。
+        
+
+author: james
+Email: smelikecat@163.com
+       
